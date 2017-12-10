@@ -10,6 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "ansi-escapes": "^3.0.0",
+    "chalk": "^2.3.0",
     "youtube-mp3-downloader": "^0.5.1"
   }
 }
