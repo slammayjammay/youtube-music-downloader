@@ -4,6 +4,7 @@ const readline = require('readline');
 const { readFileSync } = require('fs');
 const { resolve: fsResolve } = require('path')
 const chalk = require('chalk');
+const getYoutubePlaylistURLs = require('get-youtube-playlist-urls');
 const Downloader = require('./Downloader');
 const ProgressBar = require('./ProgressBar');
 
@@ -37,14 +38,16 @@ const program = (async () => {
 	const option = await new Promise((resolve, reject) => {
 		const prompt =
 			`Press ${chalk.green.bold(1)} (one) to enter the YouTube URLs to download, or\n` +
-			`Press ${chalk.green.bold(2)} (two) to enter the path of a text file containing YouTube URLs.\n` +
+			`Press ${chalk.green.bold(2)} (two) to enter a YouTube playlist URL to ` +
+			`download all videos on the playlist, or\n` +
+			`Press ${chalk.green.bold(3)} (three) to enter the path of a text file containing YouTube URLs.\n` +
 			'\n' +
 			`${chalk.green('>')} `;
 
 		rl.question(prompt, answer => {
 			answer = answer.trim();
 
-			if (!['1', '2'].includes(answer)) {
+			if (!['1', '2', '3'].includes(answer)) {
 				console.log(
 					`${chalk.red.bold('Error: ')}` +
 					`"${chalk.green.bold(answer)}" is not in the list of numbers above.`
@@ -65,8 +68,19 @@ const program = (async () => {
 		});
 	} else if (option === '2') {
 		videos = await new Promise((resolve, reject) => {
+			rl.question(`Enter the YouTube playlist URL below.\n${chalk.green('>')} `, answer => {
+				getYoutubePlaylistURLs(answer.trim())
+					.then(urls => resolve(urls))
+					.catch(error => {
+						console.log(`${chalk.red.bold('Error:')} doesn't look like that points to a valid YouTube playlist.`);
+						reject(error);
+					});
+			});
+		});
+	} else if (option === '3') {
+		videos = await new Promise((resolve, reject) => {
 			rl.question(`Please enter the file path to read from (relative or absolute).\n${chalk.green('>')} `, answer => {
-				const filePath = fsResolve(answer);
+				const filePath = fsResolve(answer.trim());
 
 				let fileContents;
 
