@@ -4,10 +4,15 @@ const { execSync } = require('child_process');
 const { readFileSync } = require('fs');
 const YoutubeMp3Downloader = require('youtube-mp3-downloader');
 
+const DEFAULT_OPTIONS = {
+	maxDownloads: 1
+};
+
 class Downloader extends EventEmitter {
-	constructor() {
+	constructor(options = {}) {
 		super();
 
+		this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 		this.urls = [];
 		this.regex = /\?v=([^&]*)/;
 
@@ -15,7 +20,7 @@ class Downloader extends EventEmitter {
 			ffmpegPath: '/usr/local/bin/ffmpeg', // TODO: add local copy
 			outputPath: `${homedir()}/Downloads`,
 			youtubeVideoQuality: 'highest',
-			queueParallelism: 1, // TODO: this is the max number of downloads?
+			queueParallelism: this.options.maxDownloads, // TODO: this is the max number of downloads?
 			progressTimeout: 300
 		});
 
@@ -28,12 +33,20 @@ class Downloader extends EventEmitter {
 		if (this.isValidURL(url)) {
 			this.urls.push(url);
 		} else {
-			this.emit('invalidId', url);
+			this.emit('URLParseError', url);
 		}
 	}
 
-	getURLS() {
+	getURLs() {
 		return this.urls;
+	}
+
+	getIds() {
+		return this.urls.map(url => this.regex.exec(url)[1]);
+	}
+
+	getIdFromURL(url) {
+		return this.regex.exec(url)[1];
 	}
 
 	isValidURL(url) {
@@ -42,10 +55,7 @@ class Downloader extends EventEmitter {
 	}
 
 	run() {
-		this.urls.forEach(url => {
-			const id = this.regex.exec(url)[1];
-			this.yd.download(id);
-		});
+		this.getIds().forEach(id => this.yd.download(id));
 	}
 }
 

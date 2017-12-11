@@ -5,6 +5,10 @@ const chalk = require('chalk');
 const Downloader = require('./Downloader');
 const ProgressBar = require('./ProgressBar');
 
+const OPTIONS = {
+	maxDownloads: 10
+};
+
 const rl = readline.createInterface({
 	input: process.stdin,
 	output: process.stdout
@@ -20,6 +24,11 @@ const program = (async () => {
 		`${chalk.green.bold('Youtube Music Downloader')}\nwill read.`
 	);
 	console.log();
+	console.log('----------------------------------------------------------------');
+	console.log(
+		`${chalk.bold('NOTE:')} there can only be a maximum number of ` +
+		`${chalk.bold(10)} downloads\nperformed.`
+	);
 	console.log('----------------------------------------------------------------');
 	console.log();
 
@@ -72,39 +81,75 @@ const program = (async () => {
 	console.log();
 	console.log('Got it!');
 
-	const downloader = new Downloader();
-	const progressBar = new ProgressBar();
-
-	downloader.on('error', error => {
-		throw new Error(error);
+	// start downloader
+	const downloader = new Downloader({ maxDownloads: OPTIONS.maxDownloads });
+	downloader.on('URLParseError', url => {
+		console.log(`Whoops! "${chalk.cyan(url)}" could not be parsed correctly. Skipping!`);
 	});
-	downloader.on('invalidId', url => {
-		console.log(`Whoops! "${chalk.cyan(url)}" doesn't seem to be a valid URL. Skipping!`);
-	});
-	downloader.on('progress', data => {
-		progressBar.update(data.progress.percentage / 100);
-	});
-	downloader.on('finished', (err, data) => {
-		console.log(chalk.green.bold('Complete!'));
-		process.exit();
-	});
-
 	videos.forEach(url => downloader.addURL(url));
 
-	if (downloader.getURLS().length === 0) {
+	if (downloader.getURLs().length === 0) {
 		console.log(`Hmm...there are no URLS to download...`);
 		process.exit();
 	}
 
+	// start progress bar
+	const progressBar = new ProgressBar({ numBars: downloader.getIds().length });
+
+	// keep track of finished videos
+	const finishedVideos = {};
+	downloader.getIds().forEach(id => finishedVideos[id] = null);
+
+	// map youtube ids to urls
+	const idMap = {};
+	downloader.getURLs().forEach(url => idMap[downloader.getIdFromURL(url)] = url);
+
+	downloader.on('error', (error, data) => {
+		progressBar.error(data.videoId);
+		finishedVideos[data.videoId] = 'fail';
+	});
+	downloader.on('progress', data => {
+		progressBar.update(data.videoId, data.progress.percentage / 100);
+	});
+	downloader.on('finished', (err, data) => {
+		finishedVideos[data.videoId] = 'success';
+		progressBar.finish(data.videoId);
+
+		const finished = Object.keys(finishedVideos).map(key => finishedVideos[key]);
+		if (finished.every(val => !!val)) {
+			console.log();
+			console.log(chalk.bold('Complete!'));
+
+			console.log(chalk.green.bold('Successful video downloads:'));
+			Object.keys(finishedVideos).forEach(id => {
+				const url = idMap[id];
+				if (finishedVideos[id] === 'success') {
+					console.log(`- ${chalk.cyan(url)}`);
+				}
+			});
+
+			console.log();
+			console.log(chalk.red.bold('Failed video downloads:'));
+			Object.keys(finishedVideos).forEach(id => {
+				const url = idMap[id];
+				if (finishedVideos[id] === 'fail') {
+					console.log(`- ${chalk.cyan(url)}`);
+				}
+			});
+			process.exit();
+		}
+	});
+
+	console.log();
 	console.log(
 		`${chalk.green.bold('Youtube Music Downloader')} will now attempt to ` +
 		`download the following URLs:`
 	);
-	downloader.getURLS().forEach(url => console.log(`- ${chalk.cyan(url)}`));
+	downloader.getURLs().forEach(url => console.log(`- ${chalk.cyan(url)}`));
 	console.log();
 
 	downloader.run();
-	progressBar.init();
+	progressBar.init(downloader.getIds());
 })();
 
 program.catch(error => {
