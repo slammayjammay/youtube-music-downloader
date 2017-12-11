@@ -6,6 +6,7 @@ This is mostly a fun wrapper for `youtube-mp3-downloader`, which takes care of t
 ```sh
 $ npm install -g https://github.com/slammayjammay/youtube-music-downloader
 ```
+
 ## Requirements
 - macOS
 - node 8!
@@ -30,4 +31,5 @@ Press 1 (one) to enter the YouTube URLs to download, or
 Press 2 (two) to enter a YouTube playlist URL to download all videos on the playlist, or
 Press 3 (three) to enter the path of a text file containing YouTube URLs.
 
-> ```
+>
+```
