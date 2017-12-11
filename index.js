@@ -123,23 +123,18 @@ const program = (async () => {
 		if (finished.every(val => !!val)) {
 			console.log();
 			console.log(chalk.bold('Complete!'));
+			console.log();
+			console.log(chalk.bold(chalk.bold.green('Download status:')));
 
-			console.log(chalk.green.bold('Successful video downloads:'));
 			Object.keys(finishedVideos).forEach(id => {
 				const url = idMap[id];
 				if (finishedVideos[id] === 'success') {
-					console.log(`- ${chalk.cyan(url)}`);
+					console.log(`- ${chalk.cyan(url)} --> ${chalk.bold.green('Success')}`);
+				} else if (finishedVideos[id] === 'fail') {
+					console.log(`- ${chalk.cyan(url)} --> ${chalk.bold.red('Fail')}`);
 				}
 			});
 
-			console.log();
-			console.log(chalk.red.bold('Failed video downloads:'));
-			Object.keys(finishedVideos).forEach(id => {
-				const url = idMap[id];
-				if (finishedVideos[id] === 'fail') {
-					console.log(`- ${chalk.cyan(url)}`);
-				}
-			});
 			process.exit();
 		}
 	});
