@@ -1,17 +1,20 @@
 {
-  "name": "youtube-downloads",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "ansi-escapes": "^3.0.0",
-    "chalk": "^2.3.0",
-    "youtube-mp3-downloader": "^0.5.1"
-  }
+	"name": "youtube-music-downloader",
+	"version": "1.0.0",
+	"description": "Given a YouTube URL, downloads and coverts to an mp3 file.",
+	"main": "./index.js",
+	"bin": "./index.js",
+	"keywords": [
+		"youtube",
+		"music",
+		"download",
+		"mp3"
+	],
+	"author": "Scott McKenzie",
+	"license": "MIT",
+	"dependencies": {
+		"ansi-escapes": "^3.0.0",
+		"chalk": "^2.3.0",
+		"youtube-mp3-downloader": "^0.5.1"
+	}
 }

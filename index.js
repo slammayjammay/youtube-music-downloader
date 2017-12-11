@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const readline = require('readline');
 const { readFileSync } = require('fs');
 const { resolve: fsResolve } = require('path')
