@@ -2,6 +2,7 @@ const EventEmitter = require('events');
 const { homedir } = require('os');
 const { execSync } = require('child_process');
 const { readFileSync } = require('fs');
+const { join } = require('path');
 const YoutubeMp3Downloader = require('youtube-mp3-downloader');
 
 const DEFAULT_OPTIONS = {
@@ -17,10 +18,10 @@ class Downloader extends EventEmitter {
 		this.regex = /\?v=([^&]*)/;
 
 		this.yd = new YoutubeMp3Downloader({
-			ffmpegPath: '/usr/local/bin/ffmpeg', // TODO: add local copy
+			ffmpegPath: join(__dirname, './ffmpeg'),
 			outputPath: `${homedir()}/Downloads`,
 			youtubeVideoQuality: 'highest',
-			queueParallelism: this.options.maxDownloads, // TODO: this is the max number of downloads?
+			queueParallelism: this.options.maxDownloads,
 			progressTimeout: 300
 		});
 
