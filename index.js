@@ -40,6 +40,8 @@ const program = (async () => {
 			`${chalk.green('>')} `;
 
 		rl.question(prompt, answer => {
+			answer = answer.trim();
+
 			if (!['1', '2'].includes(answer)) {
 				console.log(
 					`${chalk.red.bold('Error: ')}` +
