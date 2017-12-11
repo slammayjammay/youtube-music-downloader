@@ -9,13 +9,18 @@ const DEFAULT_OPTIONS = {
 	maxDownloads: 1
 };
 
+const REGEX = /\?v=([^&]*)/;
+
 class Downloader extends EventEmitter {
+	static getIdFromURL(url) {
+		return REGEX.exec(url)[1];
+	}
+
 	constructor(options = {}) {
 		super();
 
 		this.options = Object.assign({}, DEFAULT_OPTIONS, options);
 		this.urls = [];
-		this.regex = /\?v=([^&]*)/;
 
 		this.yd = new YoutubeMp3Downloader({
 			ffmpegPath: join(__dirname, './ffmpeg'),
@@ -43,15 +48,11 @@ class Downloader extends EventEmitter {
 	}
 
 	getIds() {
-		return this.urls.map(url => this.regex.exec(url)[1]);
-	}
-
-	getIdFromURL(url) {
-		return this.regex.exec(url)[1];
+		return this.urls.map(url => REGEX.exec(url)[1]);
 	}
 
 	isValidURL(url) {
-		const regMatch = this.regex.exec(url);
+		const regMatch = REGEX.exec(url);
 		return !!regMatch;
 	}
 
