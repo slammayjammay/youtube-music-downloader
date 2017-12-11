@@ -105,12 +105,17 @@ const program = (async () => {
 	const idMap = {};
 	videos.forEach(url => idMap[Downloader.getIdFromURL(url)] = url);
 
+	// ffmpeg maxes out the CPU when converting, resulting in fans going bananas
+	// for the entire duration of the download. if there are a ton of videos to
+	// download, limit the number of simultaneous donwloads.
+	const batchSize = videos.length > 20 ? OPTIONS.maxDownloads : 10;
+
 	while (videos.length > 0) {
-		if (videos.length > OPTIONS.maxDownloads) {
+		if (videos.length > batchSize) {
 			console.log('Downloading the next batch of videos...');
 		}
 
-		videoBatch = videos.splice(0, OPTIONS.maxDownloads);
+		videoBatch = videos.splice(0, batchSize);
 
 		const processedVideos = await beginDownloadProcess(videoBatch);
 		Object.assign(finishedVideos, processedVideos);
@@ -142,7 +147,7 @@ program.catch(error => {
 function beginDownloadProcess(videos) {
 	return new Promise((resolve, reject) => {
 		// create downloader
-		const downloader = new Downloader({ maxDownloads: OPTIONS.maxDownloads });
+		const downloader = new Downloader({ maxDownloads: videos.length });
 		downloader.on('URLParseError', url => {
 			console.log(`Whoops! "${chalk.cyan(url)}" could not be parsed correctly. Skipping!`);
 		});
