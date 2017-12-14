@@ -28,11 +28,6 @@ const program = (async () => {
 	);
 	console.log();
 	console.log('----------------------------------------------------------------');
-	console.log(
-		`${chalk.bold('NOTE:')} a maximum of ${chalk.bold(OPTIONS.maxDownloads)} ` +
-		`downloads can be performed at any given time.`
-	);
-	console.log('----------------------------------------------------------------');
 	console.log();
 
 	const option = await new Promise((resolve, reject) => {

@@ -24,8 +24,6 @@ line or enter them in a text file that Youtube Music Downloader
 will read.
 
 ----------------------------------------------------------------
-NOTE: a maximum of 3 downloads can be performed at any given time.
-----------------------------------------------------------------
 
 Press 1 (one) to enter the YouTube URLs to download, or
 Press 2 (two) to enter a YouTube playlist URL to download all videos on the playlist, or
