@@ -6,7 +6,8 @@ const { join } = require('path');
 const YoutubeMp3Downloader = require('youtube-mp3-downloader');
 
 const DEFAULT_OPTIONS = {
-	maxDownloads: 1
+	maxDownloads: 1,
+	downloadPath: `${homedir()}/Downloads`
 };
 
 const REGEX = /\?v=([^&]*)/;
@@ -24,7 +25,7 @@ class Downloader extends EventEmitter {
 
 		this.yd = new YoutubeMp3Downloader({
 			ffmpegPath: join(__dirname, './ffmpeg'),
-			outputPath: `${homedir()}/Downloads`,
+			outputPath: this.options.downloadPath,
 			youtubeVideoQuality: 'highest',
 			queueParallelism: this.options.maxDownloads,
 			progressTimeout: 300

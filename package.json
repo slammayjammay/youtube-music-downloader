@@ -16,7 +16,7 @@
 		"ansi-escapes": "^3.0.0",
 		"chalk": "^2.3.0",
 		"get-youtube-playlist-urls": "git+https://github.com/slammayjammay/get-youtube-playlist-urls.git",
-		"youtube-mp3-downloader": "^0.5.1"
+		"youtube-mp3-downloader": "^0.5.3"
 	},
 	"engines": {
 		"node": ">=8"

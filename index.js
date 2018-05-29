@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 const readline = require('readline');
+const { homedir } = require('os');
 const { readFileSync } = require('fs');
 const { resolve: fsResolve } = require('path')
 const chalk = require('chalk');
@@ -9,7 +10,8 @@ const Downloader = require('./Downloader');
 const ProgressBar = require('./ProgressBar');
 
 const OPTIONS = {
-	maxDownloads: 3
+	maxDownloads: 3,
+	downloadPath: `${homedir()}/Downloads/` // TODO option to specify
 };
 
 const rl = readline.createInterface({
@@ -117,7 +119,7 @@ const program = (async () => {
 	}
 
 	console.log();
-	console.log(chalk.bold('Complete!'));
+	console.log(`${chalk.bold('Complete!')} Downloaded to ${chalk.bold(OPTIONS.downloadPath)}`);
 	console.log();
 	console.log(chalk.bold(chalk.bold.green('Download status:')));
 
@@ -142,7 +144,10 @@ program.catch(error => {
 function beginDownloadProcess(videos) {
 	return new Promise((resolve, reject) => {
 		// create downloader
-		const downloader = new Downloader({ maxDownloads: videos.length });
+		const downloader = new Downloader({
+			maxDownloads: videos.length,
+			downloadPath: OPTIONS.downloadPath
+		});
 		downloader.on('URLParseError', url => {
 			console.log(`Whoops! "${chalk.cyan(url)}" could not be parsed correctly. Skipping!`);
 		});
@@ -162,6 +167,9 @@ function beginDownloadProcess(videos) {
 
 		// error
 		downloader.on('error', (error, data) => {
+			if (!data) {
+				return reject(error);
+			}
 			progressBar.error(data.videoId);
 			finishedVideos[data.videoId] = 'fail';
 		});
